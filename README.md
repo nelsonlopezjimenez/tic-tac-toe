@@ -1,3 +1,16 @@
+# 7.12.2024
+## tic-tac-toe
+### reactjs dot dev
+
+1. I am using nvs
+1. npx did not work: it could not find npm target in roaming profile location
+1. nvs using 18.16.0
+1. Available up to 21.X.X
+1. npm is already 10.X.X but with node 18.16 npm is still 9.X.X
+1. Instead of npx I use
+1. npm init react-app tic-v4
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
