@@ -26,6 +26,8 @@ function displayBuffer () {
 
 
 function displayChar () {
+    console.time();
+
     console.log(`${syncReadFile('readmeA.txt')}`); // A
     
     fs.readFile('readmeB.txt', (error, data) => { // B
@@ -42,6 +44,8 @@ function displayChar () {
     console.log(data)
 
     console.log(`${syncReadFile('readmeA.txt')}`); // A
+
+    console.timeEnd()
 }
-displayBuffer();
-// displayChar()
+// displayBuffer();
+displayChar()
