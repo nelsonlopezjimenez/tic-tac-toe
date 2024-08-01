@@ -1,0 +1,689 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<title>test-js-jupyter-INTRO-to-students-2c</title>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+html {
+  font-family: 'Arial';
+}
+
+body {
+  color: #333;
+  font-weight: 100;
+  max-width: 95%;
+  margin: 0 1em;
+}
+
+div:focus {
+  outline: none;
+}
+
+#heading {
+  font-size: 1.3em;
+  font-weight: bold;
+  padding-top: .5em;
+}
+
+#content {
+  padding-top: .5em;
+  font-size: 1em;
+}
+
+.box0 {
+  vertical-align: text-top;
+  cursor: text;
+  display: inline-block;
+  font-size: 1.1em;
+  border: 1px inset #aaa;
+  width: 95%;
+  margin: 1px;
+  padding: 2px;
+  min-height: 1em;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  resize: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.box1 {
+  display:inline-block;
+  width: 90%;
+  vertical-align:top;
+}
+
+.box2 {
+  cursor: text;
+  display:inline-block;
+  font-size: 1.1em;
+  border: 1px inset #aaa;
+  width: 95%;
+  margin: 1px;
+  padding: 2px;
+  min-height: 1em;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  resize: none;
+}
+
+.buttonactive {
+  appearance: push-button !important;
+  background-color: SkyBlue;
+}
+</style>
+<script id="mainscript" language="JavaScript" type="text/javascript"><!--
+var idcntr=0;
+var blkid=null;
+var title;
+var values = [];
+var curout = null;
+var evalfn = eval;
+
+
+function pagestartup() {
+  title = decodeURIComponent(document.URL.match(/\/([^\.\/]*)[^\/]*$/)[1]) || 'JS';
+  document.getElementById('heading').innerHTML = title;
+  document.getElementsByTagName("title")[0].innerHTML = title;
+
+  idcntr = 0;
+  while (true) {
+    b = document.getElementById("b"+idcntr);
+    if (b === null) { break; }
+    blk_resizing(b);
+    idcntr++;
+  }
+  document.getElementById("downloader").href = "missing";
+  document.getElementById("downloader").download = "missing";
+}
+
+function textarearesize(ta) {
+  var h,a,y,ny;
+  y = window.pageYOffset;
+  ta.style.height = 'auto';
+  h = ta.scrollHeight;
+  h -= 4; // twice the padding
+  ta.style.height = h+'px';
+  ny = window.pageYOffset;
+  if (ny < y-40 || y+40 < ny) { // no big jumps
+    window.scrollTo(window.pageXoffset,y);
+    setTimeout(function(){ window.scrollTo(window.pageXoffset,y); },60);
+  }
+}
+
+function blkresize(b) {
+  var d,e;
+  d = b.childNodes[1];
+  if (6<=d.childNodes.length) {
+    e = d.childNodes[5];
+    if ("TEXTAREA" === e.nodeName) { textarearesize(e); }
+    if (1<=d.childNodes[6].childNodes.length) {
+      e = d.childNodes[6].childNodes[0];
+      if ("TEXTAREA" === e.nodeName) { textarearesize(e); }
+    }
+  }
+}
+
+function textarea_resizing(ta) {
+  function resize () {
+    textarearesize(ta);
+  }
+  function delayedResize () {
+    window.setTimeout(resize, 0);
+  }
+  ta.addEventListener('change',resize,false);
+  ta.addEventListener('cut',delayedResize,false);
+  ta.addEventListener('paste',delayedResize,false);
+  ta.addEventListener('drop',delayedResize,false);
+  ta.addEventListener('keydown',delayedResize,false);
+  textarearesize(ta);
+}
+
+function blk_resizing(b) {
+  var d,e;
+  d = b.childNodes[1];
+  if (6<=d.childNodes.length) {
+    e = d.childNodes[5];
+    if ("TEXTAREA" === e.nodeName) { textarea_resizing(e); }
+    if (1<=d.childNodes[6].childNodes.length) {
+      e = d.childNodes[6].childNodes[0];
+      if ("TEXTAREA" === e.nodeName) { textarea_resizing(e); }
+    }
+  }
+}
+
+function clear_content(ev,th) {
+  idcntr = 0;
+  blkid = null;
+  values = [];
+  document.getElementById('content').innerHTML = "";
+}
+
+function toggle_rw(ev,th) {
+  var c;
+  c = document.getElementById('content');
+  if ("true" === c.contentEditable) {
+    c.contentEditable = false;
+    document.getElementById('RORW').value = "RO>RW";
+  } else {
+    c.contentEditable = true;
+    document.getElementById('RORW').value = "RW>RO";
+  }
+}
+
+function add_block(ev,th) {
+  var txt,d,c,idnum,x;
+  c = document.getElementById('content');
+  idnum = idcntr;
+  idcntr++;
+txt = '['+idnum+']:&nbsp;<span class="box1">\
+<input type="button" value="go" onclick="button_flash(go_block,event,this);" class="">\
+<input type="button" value="txt" onclick="show_block(event,this);">\
+<input type="button" value="clr" onclick="clr_block(event,this);">\
+<input type="button" value="-" onclick="vis_block(event,this);"><br>\
+<textarea id="b'+idnum+'_in" class="box0" rows=1 cols=110></textarea>\
+<div></div></span>';
+  d = document.createElement("DIV");
+  d.id = "b"+idnum;
+  d.innerHTML = txt;
+  c.appendChild(d);
+  x=document.createElement("P");
+  x.style = "margin: .75em";
+  c.appendChild(x);
+  values[idnum] = undefined;
+  blk_resizing(d);
+  d.childNodes[1].childNodes[5].focus();
+  return undefined;
+}
+
+function deletelast_block(ev,th) {
+  var d,gid,aid;
+  d = document.getElementById('content');
+  if (null === d.lastChild) { return; }
+  idcntr--;
+  gid = "b"+idcntr;
+  while (1) {
+    aid = d.lastChild.id;
+    d.removeChild(d.lastChild);
+    if (gid === aid) { break; }
+  }
+  values[idcntr] = undefined;
+}
+
+function put(s) {
+  if (null === curout) {
+    console.log(s);
+  } else {
+    curout.value += s;
+    textarearesize(curout);
+  }
+  return s;
+}
+
+function eval_script(scr) {
+  var val,errmsg;
+  try {
+    val = evalfn(scr);
+  } catch (errmsg) {
+    val = "Error: " + errmsg;
+  }
+  return val;
+}
+
+function eval_block(blk) {
+  var scr,val,e,x,b,d;
+  scr = blk.childNodes[1].childNodes[5].value;
+  blkid = blk.id;
+  d = blk.childNodes[1].childNodes[6];
+  if (1<=d.childNodes.length && d.childNodes[0].id === undefined) {
+    d.innerHTML = "";
+  }
+  if (d.childNodes.length<1) {
+    x = document.createElement("TEXTAREA");
+    x.id = blkid + "_val";
+    x.className = "box2";
+    x.rows = 1;
+    x.cols = 110;
+    d.appendChild(x);
+    textarea_resizing(x);
+  } else {
+    x = d.childNodes[0];
+  }
+  x.value = "";
+  textarearesize(x)
+  curout = x;
+  val = eval_script(scr);
+  x.value += val;
+  textarearesize(x)
+  b = +(blkid.replace(/^b/,""));
+  values[b] = val;
+  return undefined;
+}
+
+function button_flash(fn,ev,th) {
+  th.className = "buttonactive";
+  setTimeout(function() { fn(ev,th); }, 20);
+}
+
+function button_active(th) { th.className = "buttonactive"; }
+function button_reset(th) { th.className = ""; }
+
+function go_block(ev,th) {
+  var blk,txt,d;
+  blk = th.parentNode.parentNode;
+  eval_block(blk);
+  button_reset(th);
+}
+
+function golast_block(ev,th) {
+  var blk,txt,d;
+  blk = document.getElementById("b"+(idcntr-1));
+  if (null === blk) {
+    button_reset(th);
+    return;
+  }
+  eval_block(blk);
+  button_reset(th);
+}
+
+function goadd_block(ev,th) {
+  golast_block(ev,th);
+  add_block(ev,th);
+}
+
+function show_block(ev,th) {
+  var txt,d;
+  txt = th.parentNode.childNodes[5].value;
+  d = th.parentNode.childNodes[6];
+  d.innerHTML = txt;
+  return undefined;
+}
+
+function clr_block(ev,th) {
+  var t,d,x,p;
+  d = th.parentNode.childNodes[6];
+  if (1<=d.childNodes.length && (d.childNodes[0].id === "" || d.childNodes[0].id === undefined)) {
+    d.innerHTML = "";
+  }
+  if (d.childNodes.length<1) {
+    x = document.createElement("TEXTAREA");
+    x.id = blkid + "_val";
+    x.className = "box2";
+    x.rows = 1;
+    x.cols = 110;
+    d.appendChild(x);
+  } else {
+    x = d.childNodes[0];
+  }
+  x.value = "";
+  textarearesize(x);
+  p = th.parentNode;
+  t = p.childNodes[5];
+  t.className = "box0";
+  p.childNodes[0].className = "";
+  p.childNodes[1].className = "";
+  p.childNodes[2].className = "";
+  p.childNodes[3].value = "-";
+}
+
+function vis_block(ev,th) {
+  var t,p;
+  p = th.parentNode;
+  t = p.childNodes[5];
+  if ("box0" === t.className) {
+    t.className = "hidden";
+    p.childNodes[0].className = "hidden";
+    p.childNodes[1].className = "hidden";
+    p.childNodes[2].className = "hidden";
+    p.childNodes[3].value = "+";
+  } else {
+    t.className = "box0";
+    p.childNodes[0].className = "";
+    p.childNodes[1].className = "";
+    p.childNodes[2].className = "";
+    p.childNodes[3].value = "-";
+  }
+  blkresize(p.parentNode);
+}
+
+function str(n) {
+  var e;
+  e = document.getElementById("b"+n+"_val");
+  if (null === e) {
+    e = document.getElementById("b"+n);
+    if (null === e) {
+      return "";
+    } else {
+      return e.childNodes[1].childNodes[5].value;
+    }
+  } else {
+    return e.value;
+  }
+}
+
+function res(n) {
+  var e,v;
+  if (undefined === values[n]) {
+    e = document.getElementById("b"+n+"_val");
+    if (null === e) {
+      return "";
+    } else {
+      v = e.value;
+    }
+    if ("" !== v) {
+      if (isNaN(+v)) {
+        return v;
+      }
+      else {
+        return +v;
+      }
+    } else {
+      return "";
+    }
+  }
+  return values[n];
+}
+
+function expr(n) {
+  var e;
+  e = document.getElementById("b"+n);
+  if (null === e) {
+    return ""
+  } else {
+    return e.childNodes[1].childNodes[5].value;
+  }
+}
+
+function last() {
+  var b;
+  if (null === blkid) { return null; }
+  b = blkid.replace(/^b/,"");
+  return res(b-1);
+}
+
+function final() {
+  return values[idcntr-1];
+}
+
+function store_content(ev,th) {
+  var fn,p,save_link,b;
+  update_all();
+  save_link = document.getElementById("downloader");
+  if ("missing" !== save_link.href) {
+    window.URL.revokeObjectURL(save_link.href);
+    save_link.href = "missing";
+  }
+  save_link.download = "missing";
+  fn = document.URL.match(/\/([^\/]*)$/)[1];
+  b = window.document.documentElement.outerHTML;
+  p = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"\n    "http://www.w3.org/TR/html4/strict.dtd">\n' + b;
+  p = p.replace(/\n\n\n+<\/body><\/html>/,"\n\n</body></html>");
+  blob = new Blob([String.fromCharCode(0xFEFF),p],{type: "text/html;charset=" + document.characterSet});
+  save_link.href = window.URL.createObjectURL(blob);
+  save_link.download = fn;
+}
+
+function write_doc(txt) {
+  var b;
+  document.open();
+  document.write(txt);
+  document.close();
+  idcntr = 0;
+  while (true) {
+    b = document.getElementById("b"+idcntr);
+    if (b === null) { break; }
+    blk_resizing(b);
+    idcntr++;
+  }
+  blkid = null;
+  values = [];
+}
+
+function restore_content(ev,th) {
+  var rdr
+  if (undefined === window.blob) return;
+  rdr = new FileReader();
+  rdr.addEventListener("loadend",function(e) { write_doc(e.srcElement.result) });
+  rdr.readAsText(blob);
+}
+
+function do_all(ev,th) {
+  var blk,txt,d,index,v;
+  for (index=0; index<idcntr; index++) {
+    blk = document.getElementById("b"+index);
+    if (null === blk) { continue; }
+    d = blk.childNodes[1].childNodes[5];
+    txt = d.value;
+    v = document.getElementById("b"+index+"_val");
+    if (! txt.match(/^</) || (null != v && "TEXTAREA" === v.nodeName)) {
+      eval_block(blk);
+    } else {
+      d.parentNode.childNodes[6].innerHTML = txt;
+    }
+  }
+  button_reset(th);
+}
+
+function update_all() {
+  var blk,d,index,v;
+  for (index=0; index<idcntr; index++) {
+    blk = document.getElementById("b"+index);
+    if (null === blk) { continue; }
+    d = blk.childNodes[1].childNodes[5];
+    d.textContent = d.value;
+    v = document.getElementById("b"+index+"_val");
+    if (null != v && "TEXTAREA" === v.nodeName) {
+      v.textContent = v.value;
+    }
+  }
+}
+--></script>
+</head>
+<body>
+
+<span id="heading" style="display:inline-block;margin-bottom: .5em;">test-js-jupyter-INTRO-to-students-2c</span>
+
+<span style="display:inline-block;float:right;margin-top: .8em;">
+<input id="RORW" type="button" value="RW>RO" onclick="toggle_rw(event,this);">
+<input type="button" value="clear" onclick="clear_content(event,this);">
+<input type="button" value="store" onclick="store_content(event,this);">
+<input type="button" value="restore" onclick="restore_content(event,this);">
+<a id="downloader" href="missing" download="missing" target="_blank"><input type="button" value="save" onclick="store_content(event,this);"></a>
+</span>
+<br>
+
+<input type="button" value="add" onclick="add_block(event,this);" style="margin-top: .8em; margin-bottom: .5em;">
+
+<div id="content" contenteditable="true"><div id="b0">[0]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b0_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;style&gt;
+p { background-color:#bbb; font-size:18px; }
+&lt;/style&gt;
+&lt;h1&gt;JavaScript Programming Using Notebook Concept&lt;/h1&gt;</textarea><div><style>
+p { background-color:#bbb; font-size:18px; }
+</style>
+<h1>JavaScript Programming Using Notebook Concept</h1></div></span></div><p style="margin: 0.75em;"></p><div id="b1">[1]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b1_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;h2&gt;What is a notebook?&lt;/h2&gt;</textarea><div><h2>What is a notebook?</h2></div></span></div><p style="margin: 0.75em;"></p><div id="b2">[2]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b2_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;p&gt;It is a web &lt;b&gt;application&lt;/b&gt; that allows you to create and share documents that contain live code, equations, visualizations and narrative text&lt;/p&gt;
+&lt;p&gt;It is a browser-based REPL containing an ordered list of input/output cells which can contain code, text, mathematics, plots, and rich media. &lt;/p&gt;</textarea><div>
+<p>It is a web <b>application</b> that allows you to create and share documents that contain live code, equations, visualizations and narrative text</p>
+<p>It is a browser-based REPL containing an ordered list of input/output cells which can contain code, text, mathematics, plots, and rich media. </p></div></span></div><p style="margin: 0.75em;"></p><div id="b3">[3]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b3_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;h2&gt;Use:&lt;/h2&gt;
+&lt;p&gt;Document is divided into cells in input/output order&lt;/p&gt;
+&lt;p&gt;Input cell: enter either HTML or javascript code and hit the "button" txt to run HTML or "go" to execute javascript code. &lt;/p&gt;&lt;p&gt;Use the "clr" button to clear the output&lt;/p&gt;</textarea><div><h2>Use:</h2>
+<p>Document is divided into cells in input/output order</p>
+<p>Input cell: enter either HTML or javascript code and hit the "button" txt to run HTML or "go" to execute javascript code. </p><p>Use the "clr" button to clear the output</p></div></span></div><p style="margin: 0.75em;"></p><div id="b4">[4]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b4_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;h2&gt;Let's start with HTML code&lt;/h2&gt;
+&lt;ol&gt;&lt;li&gt;You can configure global style properties in the first cell&lt;/li&gt;
+&lt;li&gt;You can add in-line properties if needed&lt;/li&gt;
+&lt;li&gt;Practice with as much HTML tags as possible: add images, videos, sound, etc&lt;/li&gt;&lt;/ol&gt;</textarea><div><h2>Let's start with HTML code</h2>
+<ol><li>You can configure global style properties in the first cell</li>
+<li>You can add in-line properties if needed</li>
+<li>Practice with as much HTML tags as possible: add images, videos, sound, etc</li></ol></div></span></div><p style="margin: 0.75em;"></p><div id="b5">[5]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b5_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;style&gt;
+#blinking {animation: 3s infinite alternate slidein;}
+@keyframes slidein {from {margin-left:100%; width:300%;} 75%{font-size:300%; margin-left:25%; width:150%;} to {margin-left:0%; width:100%}}
+&lt;/style&gt;
+&lt;p id="blinking" style="background-color:red; color:white"&gt;DO NOT DELETE anything, just COPY and PASTE into additional cells and TRY AGAIN!!!!&lt;/p&gt;</textarea><div><textarea id="b0_val" class="box2" rows="1" cols="110" style="height: 16px;"></textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b6">[6]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b6_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;h3&gt;CSS Animation: the previous cell is an example of animation&lt;/h3&gt;
+&lt;h3&gt;CSS Transitions: the following examples demonstrate the functionality&lt;/h3&gt;</textarea><div><h3>CSS Animation: the previous cell is an example of animation</h3>
+<h3>CSS Transitions: the following examples demonstrate the functionality</h3></div></span></div><p style="margin: 0.75em;"></p><div id="b7">[7]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b7_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;style&gt;#delay {font-size:14px; transition-property: font-size; transition-duration:4s; transition-delay:2s;} #delay:hover {font-size: 36px;}&lt;/style&gt;
+&lt;p id="delay"&gt;This is an example of transition. HOVER ME !!!&lt;/p&gt;</textarea><div><style>#delay {font-size:14px; transition-property: font-size; transition-duration:4s; transition-delay:2s;} #delay:hover {font-size: 36px;}</style>
+<p id="delay">This is an example of transition. HOVER ME !!!</p></div></span></div><p style="margin: 0.75em;"></p><div id="b8">[8]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b8_in" class="hidden" rows="1" cols="110" style="height: auto;">#delay {font-size:14px; transition-property: font-size; transition-duration:4s; transition-delay:2s;} #delay:hover {font-size: 36px;}
+&lt;p id="delay"&gt;This is an example of transition. HOVER ME !!!&lt;/p&gt;</textarea><div>#delay {font-size:14px; transition-property: font-size; transition-duration:4s; transition-delay:2s;} #delay:hover {font-size: 36px;}
+<p id="delay">This is an example of transition. HOVER ME !!!</p></div></span></div><p style="margin: 0.75em;"></p><div id="b9">[9]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b9_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;style&gt;.box {border-style: solid; border-width: 1px; display: block; width:100px; height: 100px; background-color: #00f; transition: width 2s, height 2s, background-color 2s, transform 2s;} .box:hover {background-color: #fcc; width: 200px; height: 200px; transform: rotate(180deg);}&lt;/style&gt;
+&lt;div class="box"&gt;&lt;/div&gt;</textarea><div><style>.box {border-style: solid; border-width: 1px; display: block; width:100px; height: 100px; background-color: #00f; transition: width 2s, height 2s, background-color 2s, transform 2s;} .box:hover {background-color: #fcc; width: 200px; height: 200px; transform: rotate(180deg);}</style>
+<div class="box"></div></div></span></div><p style="margin: 0.75em;"></p><div id="b10">[10]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b10_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;style&gt;a {color: #fff; background-color: #333; transition: all 1s ease-out;} a:hover, a:focus {color: #333; background-color: #fff;} a:not(:last-child) {margin-right: 12px;}nav {display: flex; padding: 12px; background-color: #333;} a {width: 100px; border: 1px solid #fff; border-radius: 18px; outline: 0; padding: 8px 12px; text-align: center; text-decoration: none; font: bold 12px Verdana; color: #fff; background-color: #333; transition-property: color, background-color; transition-duration: 1s; transition-time-function: ease-out;}&lt;/style&gt;
+&lt;h3&gt;Using transitions when highlighting menus&lt;/h3&gt;
+&lt;nav&gt; &lt;a href="#"&gt;Home&lt;/a&gt; &lt;a href="#"&gt;About&lt;/a&gt;&lt;a href="#"&gt;Contact Us&lt;/a&gt;&lt;a href="#"&gt;Links&lt;/a&gt;&lt;/nav&gt;</textarea><div><style>a {color: #fff; background-color: #333; transition: all 1s ease-out;} a:hover, a:focus {color: #333; background-color: #fff;} a:not(:last-child) {margin-right: 12px;}nav {display: flex; padding: 12px; background-color: #333;} a {width: 100px; border: 1px solid #fff; border-radius: 18px; outline: 0; padding: 8px 12px; text-align: center; text-decoration: none; font: bold 12px Verdana; color: #fff; background-color: #333; transition-property: color, background-color; transition-duration: 1s; transition-time-function: ease-out;}</style>
+<h3>Using transitions when highlighting menus</h3>
+<nav> <a href="#">Home</a> <a href="#">About</a><a href="#">Contact Us</a><a href="#">Links</a></nav></div></span></div><p style="margin: 0.75em;"></p><div id="b11">[11]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b11_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;h3&gt;Using transitions to make JavaScript functionality smooth&lt;/h3&gt;
+&lt;p&gt;Transitions are a great tool to make things look much smoother without having to do anything to your JavaScript functionality. &lt;/p&gt;</textarea><div><h3>Using transitions to make JavaScript functionality smooth</h3>
+<p>Transitions are a great tool to make things look much smoother without having to do anything to your JavaScript functionality. </p></div></span></div><p style="margin: 0.75em;"></p><div id="b12">[12]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);" class=""><input type="button" value="clr" onclick="clr_block(event,this);" class=""><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b12_in" class="box0" rows="1" cols="110" style="height: 128px;">&lt;h3&gt;Using JavaScript you can make the effect of moving the ball to a certain position happen:&lt;h3&gt;
+&lt;p&gt;&lt;pre&gt;const f = document.querySelector('#foo');
+document.addEventListener('click', function(event) {
+   f.style.transform = 'translateY('+(event.clientY-25)+'px)';
+   f.style.transform += 'translateX('+(event.clientX-25)+'px)';
+}, false);
+&lt;/pre&gt;&lt;/p&gt;
+</textarea><div><h3>Using JavaScript you can make the effect of moving the ball to a certain position happen:</h3><h3>
+<p></p><pre>const f = document.querySelector('#foo');
+document.addEventListener('click', function(event) {
+   f.style.transform = 'translateY('+(event.clientY-25)+'px)';
+   f.style.transform += 'translateX('+(event.clientX-25)+'px)';
+}, false);
+</pre><p></p>
+</h3></div></span></div><p style="margin: 0.75em;"></p><div id="b13">[13]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b13_in" class="hidden" rows="1" cols="110" style="height: auto;">&lt;h3&gt;with CSS you can make it smooth without any extra effort. Add a transition to the element and any change will happen smoothly&lt;/h3&gt;</textarea><div><h3>with CSS you can make it smooth without any extra effort. Add a transition to the element and any change will happen smoothly</h3></div></span></div><p style="margin: 0.75em;"></p><div id="b14">[14]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b14_in" class="box0" rows="1" cols="110" style="height: 80px;">&lt;style&gt;.ball {border-radius: 25px; width: 50px; height: 50ps; background: #c00; position: absolute; top: 0; left: 0; transition: transform 1s;} main { border: 1px solid #ccc}&lt;/style&gt;
+&lt;h1&gt;Click anywhere to move the ball&lt;/h1&gt;
+&lt;main id="foo" class="ball" "&gt;&lt;/main&gt;
+</textarea><div><style>.ball {border-radius: 25px; width: 50px; height: 50ps; background: #c00; position: absolute; top: 0; left: 0; transition: transform 1s;} main { border: 1px solid #ccc}</style>
+<h1>Click anywhere to move the ball</h1>
+<main id="foo" class="ball" "=""></main>
+</div></span></div><p style="margin: 0.75em;"></p><div id="b15">[15]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class="hidden"><input type="button" value="txt" onclick="show_block(event,this);" class="hidden"><input type="button" value="clr" onclick="clr_block(event,this);" class="hidden"><input type="button" value="+" onclick="vis_block(event,this);"><br><textarea id="b15_in" class="hidden" rows="1" cols="110" style="height: auto;">https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/conditionals
+https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
+&lt;h1&gt;Async/await&lt;/h1&gt;
+&lt;p&gt;So the async keyword is added to functions to tell them to return a promise rather than directly returning the value.&lt;/p&gt;</textarea><div>https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/conditionals
+https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
+<h1>Async/await</h1>
+<p>So the async keyword is added to functions to tell them to return a promise rather than directly returning the value.</p></div></span></div><p style="margin: 0.75em;"></p><div id="b16">[16]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);" class=""><input type="button" value="clr" onclick="clr_block(event,this);" class=""><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b16_in" class="box0" rows="1" cols="110" style="height: 32px;">function hello() { return "Hello" };
+hello();</textarea><div><textarea id="b16_val" class="box2" rows="1" cols="110" style="height: 16px;">Hello</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b17">[17]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b17_in" class="box0" rows="1" cols="110" style="height: 32px;">async function hello() { return "Hello" };
+hello();</textarea><div><textarea id="b17_val" class="box2" rows="1" cols="110" style="height: 16px;">[object Promise]</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b18">[18]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b18_in" class="box0" rows="1" cols="110" style="height: 64px;">let hello = async function() {
+   return "Hello";
+}
+hello()</textarea><div><textarea id="b18_val" class="box2" rows="1" cols="110" style="height: 16px;">[object Promise]</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b19">[19]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b19_in" class="box0" rows="1" cols="110" style="height: 32px;">let helloArrow = async () =&gt; "Hello Arrow"
+helloArrow();</textarea><div><textarea id="b19_val" class="box2" rows="1" cols="110" style="height: 16px;">[object Promise]</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b20">[20]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b20_in" class="box0" rows="1" cols="110" style="height: 16px;">hello().then( (v) =&gt; put(v));</textarea><div><textarea id="b20_val" class="box2" rows="1" cols="110" style="height: 16px;">[object Promise]Hello</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b21">[21]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);" class=""><input type="button" value="clr" onclick="clr_block(event,this);" class=""><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b21_in" class="box0" rows="1" cols="110" style="height: 16px;">hello().then(put)</textarea><div><textarea id="b20_val" class="box2" rows="1" cols="110" style="height: 16px;"></textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b22">[22]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b22_in" class="box0" rows="1" cols="110" style="height: 64px;">async function hello() {
+   return greeting = await Promise.resolve('Hello');
+};
+hello().then(alert)</textarea><div><textarea id="b22_val" class="box2" rows="1" cols="110" style="height: 16px;">[object Promise]</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b23">[23]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b23_in" class="box0" rows="1" cols="110" style="height: 16px;"></textarea><div></div></span></div><p style="margin: 0.75em;"></p><div id="b24">[24]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);" class=""><input type="button" value="clr" onclick="clr_block(event,this);" class=""><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b24_in" class="box0" rows="1" cols="110" style="height: 1168px;">//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
+let result ="";
+function resolveAfter2Seconds() {
+   result += "starting slow promise";
+  console.log("starting slow promise")
+  return new Promise(resolve =&gt; {
+    setTimeout(function() {
+      resolve("slow")
+      console.log("slow promise is done")
+    }, 2000)
+  })
+}
+
+function resolveAfter1Second() {
+  console.log("starting fast promise")
+  return new Promise(resolve =&gt; {
+    setTimeout(function() {
+      resolve("fast")
+      console.log("fast promise is done")
+    }, 1000)
+  })
+}
+
+async function sequentialStart() {
+  console.log('==SEQUENTIAL START==')
+
+  // 1. Execution gets here almost instantly
+  const slow = await resolveAfter2Seconds()
+  console.log(slow) // 2. this runs 2 seconds after 1.
+
+  const fast = await resolveAfter1Second()
+  console.log(fast) // 3. this runs 3 seconds after 1.
+}
+
+async function concurrentStart() {
+  console.log('==CONCURRENT START with await==');
+  const slow = resolveAfter2Seconds() // starts timer immediately
+  const fast = resolveAfter1Second() // starts timer immediately
+
+  // 1. Execution gets here almost instantly
+  console.log(await slow) // 2. this runs 2 seconds after 1.
+  console.log(await fast) // 3. this runs 2 seconds after 1., immediately after 2., since fast is already resolved
+}
+
+function concurrentPromise() {
+  console.log('==CONCURRENT START with Promise.all==')
+  return Promise.all([resolveAfter2Seconds(), resolveAfter1Second()]).then((messages) =&gt; {
+    console.log(messages[0]) // slow
+    console.log(messages[1]) // fast
+  })
+}
+
+async function parallel() {
+  console.log('==PARALLEL with await Promise.all==')
+
+  // Start 2 "jobs" in parallel and wait for both of them to complete
+  await Promise.all([
+      (async()=&gt;console.log(await resolveAfter2Seconds()))(),
+      (async()=&gt;console.log(await resolveAfter1Second()))()
+  ])
+}
+
+sequentialStart() // after 2 seconds, logs "slow", then after 1 more second, "fast"
+
+// wait above to finish
+setTimeout(concurrentStart, 4000) // after 2 seconds, logs "slow" and then "fast"
+
+// wait again
+setTimeout(concurrentPromise, 7000) // same as concurrentStart
+
+// wait again
+setTimeout(parallel, 10000) // truly parallel: after 1 second, logs "fast", then after 1 more second, "slow"
+put(result)</textarea><div><textarea id="b24_val" class="box2" rows="1" cols="110" style="height: 16px;">starting slow promisestarting slow promise</textarea></div></span></div><p style="margin: 0.75em;"></p><div id="b25">[25]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);" class=""><input type="button" value="clr" onclick="clr_block(event,this);" class=""><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b25_in" class="box0" rows="1" cols="110" style="height: 80px;">&lt;h2&gt;&lt;b&gt;async function&lt;/b&gt;&lt;/h2
+&lt;p&gt;An async function is a function declared with the async keyword, and the await keyword is permitted within them. The async and await keywords enable asynchronous, promise-based behavior to be written in a cleaner style, avoiding the need to explicitly configure promise chains.&lt;/p&gt;
+
+</textarea><div><h2><b>async function</b></h2>An async function is a function declared with the async keyword, and the await keyword is permitted within them. The async and await keywords enable asynchronous, promise-based behavior to be written in a cleaner style, avoiding the need to explicitly configure promise chains.<p></p>
+
+</div></span></div><p style="margin: 0.75em;"></p><div id="b26">[26]:&nbsp;<span class="box1"><input type="button" value="go" onclick="button_flash(go_block,event,this);" class=""><input type="button" value="txt" onclick="show_block(event,this);"><input type="button" value="clr" onclick="clr_block(event,this);"><input type="button" value="-" onclick="vis_block(event,this);"><br><textarea id="b26_in" class="box0" rows="1" cols="110" style="height: 272px;">function resolveAfter2Seconds() {
+  return new Promise(resolve =&gt; {
+    setTimeout(() =&gt; {
+      resolve('resolved');
+    }, 4000);
+  });
+}
+
+async function asyncCall() {
+  put('calling');
+  const result = await resolveAfter2Seconds();
+  put(result);
+  // expected output: "resolved"
+}
+
+asyncCall();
+</textarea><div><textarea id="b26_val" class="box2" rows="1" cols="110" style="height: 16px;">calling[object Promise]resolved</textarea></div></span></div><p style="margin: 0.75em;"></p></div>
+
+<input type="button" value="go last" onclick="button_flash(golast_block,event,this);" class="">
+
+<span style="display:inline-block;width:.2em"></span>
+<input type="button" value="add" onclick="add_block(event,this);">
+
+<span style="display:inline-block;width:.2em"></span>
+<input type="button" value="go-add" onclick="button_flash(goadd_block,event,this);" class="">
+
+<span style="display:inline-block;width: .2em"></span>
+<input type="button" value="go all" onclick="button_flash(do_all,event,this);" class="">
+
+<span style="display:inline-block;width:15%;"></span>
+<input type="button" value="delete" onclick="deletelast_block(event,this);">
+
+<p style="height: 10em"></p>
+
+<script language="JavaScript" type="text/javascript">
+pagestartup();
+--></script>
+
+<div id="extension-ebdbc"></div></body></html>

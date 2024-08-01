@@ -42,7 +42,7 @@ x-filled square
 ```
 1. Now let’s have a look at the files in the starter code.
 
-1. ***App.js ***
+1. *App.js*
 The code in App.js creates a component. In React, a component is a piece of reusable code that represents a part of a user interface. Components are used to render, manage, and update the UI elements in your application. Let’s look at the component line by line to see what’s going on:
 ```js
 export default function Square() {
@@ -51,7 +51,7 @@ export default function Square() {
 ```
 The first line defines a function called Square. The export JavaScript keyword makes this function accessible outside of this file. The default keyword tells other files using your code that it’s the main function in your file.
 
-The second line returns a button. The return JavaScript keyword means whatever comes after is returned as a value to the caller of the function. <button> is a JSX element. A JSX element is a combination of JavaScript code and HTML tags that describes what you’d like to display. className="square" is a button property or prop that tells CSS how to style the button. X is the text displayed inside of the button and </button> closes the JSX element to indicate that any following content shouldn’t be placed inside the button.
+The second line returns a button. The return JavaScript keyword means whatever comes after is returned as a value to the caller of the function. &lt;button> is a JSX element. A JSX element is a combination of JavaScript code and HTML tags that describes what you’d like to display. className="square" is a button property or prop that tells CSS how to style the button. X is the text displayed inside of the button and &lt;/button> closes the JSX element to indicate that any following content shouldn’t be placed inside the button.
 
 1. styles.css 
 
@@ -86,7 +86,7 @@ export default function Square() {
 ```
 You’ll get this error:
 ```
-Console
+
 /src/App.js: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX Fragment <>...</>?
 ```
 React components need to return a single JSX element and not multiple adjacent JSX elements like two buttons. To fix this you can use Fragments (<> and </>) to wrap multiple adjacent JSX elements like this:
@@ -397,11 +397,11 @@ function Square() {
   );
 }
 ```
-By calling this set function from an onClick handler, you’re telling React to re-render that Square whenever its <button> is clicked. After the update, the Square’s value will be 'X', so you’ll see the “X” on the game board. Click on any Square, and “X” should show up:
-
+By calling this set function from an onClick handler, you’re telling React to re-render that Square whenever its &lt;button> is clicked. After the update, the Square’s value will be 'X', so you’ll see the “X” on the game board. Click on any Square, and “X” should show up:
+```
 adding xes to board
 
-
+```
 Each Square has its own state: the value stored in each Square is completely independent of the others. When you call a set function in a component, React automatically updates the child components inside too.
 
 After you’ve made the above changes, your code will look like this:
@@ -659,7 +659,7 @@ Why didn’t this problem happen earlier?
 ```
 #### NOTE: Difference between passing and calling a function!!!
 
-When you were passing onSquareClick={handleClick}, you were passing the handleClick function down as a prop. You were not calling it! But now you are calling that function right away — notice the parentheses in handleClick(0)—and that’s why it runs too early. You don’t want to call handleClick until the user clicks!
+When you were passing onSquareClick={handleClick}, you were passing the handleClick function down as a prop. You were not calling it! But now you are calling that function right away — notice the parentheses in handleClick(0) — and that’s why it runs too early. You don’t want to call handleClick until the user clicks!
 
 You could fix this by creating a function like handleFirstSquareClick that calls handleClick(0), a function like handleSecondSquareClick that calls handleClick(1), and so on. You would pass (rather than call) these functions down as props like onSquareClick={handleFirstSquareClick}. This would solve the infinite loop.
 
